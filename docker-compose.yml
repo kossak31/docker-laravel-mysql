@@ -1,0 +1,34 @@
+version: "3.7"
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    container_name: docker-laravel
+    restart: unless-stopped
+    command: bash -c "while true; do  ../entrypoint.sh; sleep 2; done"
+    ports:
+      - 8000:80
+    depends_on:
+      - mysql-laravel
+    networks:
+      - rede
+
+  mysql-laravel:
+    image: mysql:5.7
+    container_name: mysql-laravel
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - 3306:3306
+    networks:
+      - rede
+networks:
+  rede:
+    driver: "bridge"
+    ipam:
+      config:
+        - subnet: 15.0.0.0/24
